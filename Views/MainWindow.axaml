@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:GpuMonitor.ViewModels" xmlns:sp="using:ScottPlot.Avalonia" x:Class="GpuMonitor.Views.MainWindow" x:DataType="vm:MainWindowViewModel" Title="GPU Monitor · CUDA telemetry" Width="1440" Height="850" MinWidth="1200" MinHeight="650" Background="#101722">
+<Window.Styles>
+ <Style Selector="Border.card"><Setter Property="Background" Value="#192332"/><Setter Property="CornerRadius" Value="8"/><Setter Property="Padding" Value="16,12"/><Setter Property="Margin" Value="0,0,10,0"/></Style>
+ <Style Selector="TextBlock.label"><Setter Property="Foreground" Value="#A5B4C9"/><Setter Property="FontSize" Value="12"/></Style>
+ <Style Selector="TextBlock.value"><Setter Property="FontSize" Value="24"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,5,0,0"/></Style>
+</Window.Styles>
+<Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+ <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+  <StackPanel><TextBlock Text="GPU MONITOR / CUDA WORKSTATION" Foreground="#58D6B0" FontSize="11" LetterSpacing="2"/><TextBlock Text="{Binding GpuName}" FontSize="28" FontWeight="SemiBold" Margin="0,6,0,0"/></StackPanel>
+  <Border Grid.Column="1" VerticalAlignment="Center" BorderBrush="{Binding WarningColor}" BorderThickness="1" CornerRadius="6" Padding="12,6"><TextBlock Text="{Binding ThermalState}" Foreground="{Binding WarningColor}"/></Border>
+ </Grid>
+ <Grid Grid.Row="1" Grid.RowSpan="3" ColumnDefinitions="*,16,*" RowDefinitions="Auto,*">
+ <StackPanel Margin="0,0,0,12" Spacing="12">
+  <TextBlock Text="SYSTEM / COOLING" FontSize="16" FontWeight="SemiBold" Foreground="#C49BFF"/>
+  <UniformGrid Columns="2"><Border Classes="card"><StackPanel><TextBlock Classes="label" Text="CPU UTILIZATION"/><TextBlock Classes="value" Text="{Binding Cpu}"/></StackPanel></Border><Border Classes="card"><StackPanel><TextBlock Classes="label" Text="PHYSICAL MEMORY"/><TextBlock Classes="value" Text="{Binding Ram}"/></StackPanel></Border></UniformGrid>
+  <TextBlock Text="{Binding Disk}"/>
+  <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Classes="label" Text="CPU PACKAGE POWER"/><TextBlock Text="{Binding CpuPower}"/><TextBlock Classes="label" Text="CPU TEMPERATURE"/><TextBlock Text="{Binding CpuTemperature}"/><TextBlock Classes="label" Text="GPU FAN"/><TextBlock Text="{Binding Fan}"/></StackPanel>
+ </StackPanel>
+ <StackPanel Grid.Column="2" Margin="0,0,0,12" Spacing="12">
+  <TextBlock Text="GPU / NVIDIA" FontSize="16" FontWeight="SemiBold" Foreground="#58D6B0"/>
+  <UniformGrid Columns="2"><Border Classes="card"><StackPanel><TextBlock Classes="label" Text="DEDICATED VRAM"/><TextBlock Classes="value" Text="{Binding Vram}" Foreground="#6CAEFF"/></StackPanel></Border><Border Classes="card"><StackPanel><TextBlock Classes="label" Text="MEMORY JUNCTION"/><TextBlock Classes="value" Text="{Binding Junction}" Foreground="{Binding WarningColor}"/></StackPanel></Border></UniformGrid>
+  <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Classes="label" Text="CORE"/><TextBlock Text="{Binding Core}"/><TextBlock Classes="label" Text="HOTSPOT"/><TextBlock Text="{Binding Hotspot}"/><TextBlock Classes="label" Text="LOAD"/><TextBlock Text="{Binding Load}"/><TextBlock Classes="label" Text="POWER"/><TextBlock Text="{Binding Power}"/></StackPanel>
+  <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Classes="label" Text="FAN"/><TextBlock Text="{Binding Fan}"/><TextBlock Text="{Binding Clocks}"/></StackPanel>
+ </StackPanel>
+ <Border Grid.Row="1" Background="#192332" CornerRadius="8" Padding="8"><sp:AvaPlot x:Name="SystemChart"/></Border>
+ <Border Grid.Row="1" Grid.Column="2" Background="#192332" CornerRadius="8" Padding="8"><sp:AvaPlot x:Name="Chart"/></Border>
+ </Grid>
+ <StackPanel Grid.Row="4" Margin="0,14,0,0" Spacing="8">
+  <StackPanel Orientation="Horizontal" Spacing="10">
+   <TextBlock VerticalAlignment="Center" Text="Memory thresholds °C"/>
+   <TextBlock VerticalAlignment="Center" Text="Warning" Foreground="#FFC66D"/><NumericUpDown Width="125" Minimum="20" Maximum="150" Value="{Binding Warning, Mode=TwoWay}" FormatString="0"/>
+   <TextBlock VerticalAlignment="Center" Text="Hot" Foreground="#FF9972"/><NumericUpDown Width="125" Minimum="20" Maximum="150" Value="{Binding Hot, Mode=TwoWay}" FormatString="0"/>
+   <TextBlock VerticalAlignment="Center" Text="Reference" Foreground="#FF727F"/><NumericUpDown Width="125" Minimum="20" Maximum="150" Value="{Binding Reference, Mode=TwoWay}" FormatString="0"/>
+  </StackPanel>
+  <TextBlock Classes="label" Text="{Binding LimitDescription}"/>
+ </StackPanel>
+ <StackPanel Grid.Row="5" Margin="0,14,0,0" Spacing="4"><TextBlock Text="{Binding Status}" FontSize="12"/><TextBlock Text="{Binding Sensor}" Foreground="#7D8DA5" FontSize="11"/></StackPanel>
+</Grid>
+</Window>
+
+
+
+

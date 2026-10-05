@@ -1,0 +1,17 @@
+bin/
+obj/
+.vs/
+*.user
+sensor-report.json
+performance-report.json
+
+app-*.log
+performance-final.json
+
+build-v2/
+v2-*.log
+
+artifacts/
+
+*-run.json
+load-test-pid.txt
