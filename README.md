@@ -105,3 +105,5 @@ Rebuild with `dotnet publish -p:PublishProfile=Portable`. Trimming is disabled t
 
 The standalone EXE was copied into an isolated folder, successfully probed the RTX 3090, and launched its desktop window using the bundled runtime. An RTX 5090 has not been available for verification. NVIDIA selection uses the detected hardware; if both a 3090 and 5090 are installed, the existing selection policy prefers the 3090. Missing sensors show N/A and are never replaced with core temperature. The VRAM axis expands to the detected capacity when it exceeds 24 GB. Run `GpuMonitor.exe --probe` from a writable working directory to produce sensor-report.json for the new machine.
 
+
+Use **Clear** before starting a load test to discard both histories and reset the disk throughput scale to 0–10 MB/s. Sampling continues at one second, and the scale adapts only to new samples. Temperature thresholds and current-value cards are preserved.

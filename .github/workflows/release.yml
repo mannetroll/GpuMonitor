@@ -1,4 +1,4 @@
-name: Publish portable release
+name: Publish portable release # v0.1.0 Clear-button update
 on:
   push:
     paths:
@@ -33,3 +33,5 @@ jobs:
           }
           gh release upload v0.1.0 $exe --clobber
           if ($LASTEXITCODE -ne 0) { throw 'EXE upload failed' }
+          gh release edit v0.1.0 --notes 'Portable Windows x64 GPU and system monitor. Updated with Clear: resets both graph histories and automatic disk scaling before a load test, while sampling continues. Includes 15-minute charts, NVIDIA telemetry, GPU fan history, CPU/RAM/disk metrics, and configurable warnings. Download GpuMonitor.exe; no .NET installation required. Tested on RTX 3090; RTX 5090 sensors remain unverified.'
+          if ($LASTEXITCODE -ne 0) { throw 'Release notes update failed' }

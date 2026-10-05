@@ -73,9 +73,27 @@ public partial class MainWindow : Window
   }
   catch (OperationCanceledException) { }
  }
+ private DateTimeOffset clearedAt = DateTimeOffset.MinValue;
+ private double lastTotalGb = 24;
+ private void ClearHistory(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+ {
+  clearedAt = DateTimeOffset.Now;
+  history.Clear(); systemHistory.Clear();
+  Array.Fill(memory,double.NaN); Array.Fill(temperature,double.NaN);
+  Array.Fill(cpuValues,double.NaN); Array.Fill(ramValues,double.NaN);
+  Array.Fill(diskValues,double.NaN); Array.Fill(fanValues,double.NaN);
+  for(int i=0;i<times.Length;i++) times[i]=clearedAt.LocalDateTime.AddSeconds(i-900).ToOADate();
+  UpdateAxes(clearedAt,lastTotalGb);
+  systemChart.Plot.Axes.SetLimitsX(times[0],times[^1]);
+  systemChart.Plot.Axes.SetLimitsY(0,100);
+  systemChart.Plot.Axes.SetLimitsY(0,10,systemChart.Plot.Axes.Right);
+  chart.Refresh(); systemChart.Refresh();
+ }
  private void Apply(GpuSample sample,string sensor,SystemSample system)
  {
   if (closing) return;
+  if (sample.Timestamp <= clearedAt) return;
+  lastTotalGb=sample.MemoryTotalGb ?? lastTotalGb;
   history.Add(sample); systemHistory.Add(system); vm.Apply(sample,sensor); vm.ApplySystem(system);
   if (WindowState == WindowState.Minimized) return;
   var offset=times.Length-history.Count;
@@ -114,6 +132,7 @@ public partial class MainWindow : Window
  private void SaveSettings()
  { try { if(vm.ValidThresholds) { Directory.CreateDirectory(Path.GetDirectoryName(settingsPath)!); File.WriteAllText(settingsPath,JsonSerializer.Serialize(new[]{vm.Warning,vm.Hot,vm.Reference})); } } catch(Exception e) { System.Diagnostics.Debug.WriteLine(e.Message); } }
 }
+
 
 
 

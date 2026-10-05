@@ -5,9 +5,10 @@
  <Style Selector="TextBlock.value"><Setter Property="FontSize" Value="24"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,5,0,0"/></Style>
 </Window.Styles>
 <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
- <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+ <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,20">
   <StackPanel><TextBlock Text="GPU MONITOR / CUDA WORKSTATION" Foreground="#58D6B0" FontSize="11" LetterSpacing="2"/><TextBlock Text="{Binding GpuName}" FontSize="28" FontWeight="SemiBold" Margin="0,6,0,0"/></StackPanel>
-  <Border Grid.Column="1" VerticalAlignment="Center" BorderBrush="{Binding WarningColor}" BorderThickness="1" CornerRadius="6" Padding="12,6"><TextBlock Text="{Binding ThermalState}" Foreground="{Binding WarningColor}"/></Border>
+  <Button Grid.Column="1" Content="Clear" Click="ClearHistory" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip.Tip="Clear both histories and reset scales; sampling continues."/>
+  <Border Grid.Column="2" VerticalAlignment="Center" BorderBrush="{Binding WarningColor}" BorderThickness="1" CornerRadius="6" Padding="12,6"><TextBlock Text="{Binding ThermalState}" Foreground="{Binding WarningColor}"/></Border>
  </Grid>
  <Grid Grid.Row="1" Grid.RowSpan="3" ColumnDefinitions="*,16,*" RowDefinitions="Auto,*">
  <StackPanel Margin="0,0,0,12" Spacing="12">
@@ -37,6 +38,7 @@
  <StackPanel Grid.Row="5" Margin="0,14,0,0" Spacing="4"><TextBlock Text="{Binding Status}" FontSize="12"/><TextBlock Text="{Binding Sensor}" Foreground="#7D8DA5" FontSize="11"/></StackPanel>
 </Grid>
 </Window>
+
 
 
 

@@ -23,3 +23,7 @@ vm.Apply(new(DateTimeOffset.Now,"RTX 3090",Error:"temporary error"),"test");Chec
 Console.WriteLine($"{checks} checks passed.");
 
 Check(new SystemSample(RamUsedGb:32,RamTotalGb:64).RamPercent==50,"RAM percentage");
+ring.Clear();
+Check(ring.Count==0 && ring.Capacity==901,"Clear removes history without changing capacity");
+ring.Add(7);ring.Add(8);
+Check(ring.Count==2 && ring[0]==7 && ring[1]==8,"Sampling resumes in order after clear");
