@@ -1,0 +1,35 @@
+name: Publish portable release
+on:
+  push:
+    paths:
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v0.1.0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build portable executable
+        run: dotnet publish -p:PublishProfile=Portable
+      - name: Publish release and executable
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $exe = 'artifacts/win-x64/GpuMonitor.exe'
+          if (-not (Test-Path $exe)) { throw 'Portable executable missing' }
+          gh release view v0.1.0 *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create v0.1.0 --verify-tag --title 'GpuMonitor v0.1.0' --notes 'Portable Windows x64 GPU and system monitor. Download GpuMonitor.exe; no .NET installation required. Includes 15-minute charts, NVIDIA telemetry, GPU fan history, CPU/RAM/disk metrics, and configurable temperature warnings. Tested on RTX 3090; RTX 5090 sensor availability is not yet verified.'
+            if ($LASTEXITCODE -ne 0) { throw 'Release creation failed' }
+          }
+          gh release upload v0.1.0 $exe --clobber
+          if ($LASTEXITCODE -ne 0) { throw 'EXE upload failed' }
