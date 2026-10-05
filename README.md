@@ -1,6 +1,6 @@
 # GPU Monitor
 
-![GPU Monitor — one minute idle, five minutes of GPU load, then five minutes of cooldown](https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/idle-load-cooldown-dashboard.png)
+![GPU Monitor — one minute idle, five minutes of GPU load, then five minutes of cooldown](https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/idle-load-cooldown-branded.png)
 
 [Download the portable Windows x64 EXE](https://github.com/mannetroll/GpuMonitor/releases/download/v0.1.0/GpuMonitor.exe) · [Release v0.1.0](https://github.com/mannetroll/GpuMonitor/releases/tag/v0.1.0)
 
@@ -101,3 +101,5 @@ Copy `artifacts/win-x64/GpuMonitor.exe` alone to another Windows x64 machine. No
 Rebuild with `dotnet publish -p:PublishProfile=Portable`. Trimming is disabled to preserve UI and hardware-library compatibility.
 
 The standalone EXE was copied into an isolated folder, successfully probed the RTX 3090, and launched its desktop window using the bundled runtime. An RTX 5090 has not been available for verification. NVIDIA selection uses the detected hardware; if both a 3090 and 5090 are installed, the existing selection policy prefers the 3090. Missing sensors show N/A and are never replaced with core temperature. Run `GpuMonitor.exe --probe` from a writable working directory to produce sensor-report.json for the new machine.
+
+The Windows executable and app window use a custom GPU telemetry icon. The dashboard and PNG exports include Copyright © Mannetroll Solutions AB.

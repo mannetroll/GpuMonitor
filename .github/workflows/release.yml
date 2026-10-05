@@ -1,4 +1,4 @@
-name: Publish portable release # v0.1.0 dashboard export and update speeds
+name: Publish portable release # v0.1.0 application icon and copyright
 on:
   push:
     paths:
@@ -33,6 +33,6 @@ jobs:
           }
           gh release upload v0.1.0 $exe --clobber
           if ($LASTEXITCODE -ne 0) { throw 'EXE upload failed' }
-          gh release edit v0.1.0 --notes 'Portable Windows x64 GPU and system monitor. GPU history: power (W), core and memory junction temperatures. System history: CPU, RAM, GPU fan and GPU load. VRAM stays a live value. Includes 15-minute history, Clear, dated LIVE status, High (0.25 s), Normal (1 s), Low (4 s) and Paused update speeds, plus Save PNG with a matching border. Download GpuMonitor.exe; no .NET installation required. Tested on RTX 3090; RTX 5090 sensors remain unverified. Latest load/cooldown screenshot: https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/idle-load-cooldown-dashboard.png'
+          gh release edit v0.1.0 --notes 'Portable Windows x64 GPU and system monitor. GPU history: power (W), core and memory junction temperatures. System history: CPU, RAM, GPU fan and GPU load. VRAM stays a live value. Includes 15-minute history, Clear, dated LIVE status, High (0.25 s), Normal (1 s), Low (4 s) and Paused update speeds, plus Save PNG with a matching border. Includes a custom application icon and Mannetroll Solutions AB copyright footer. Download GpuMonitor.exe; no .NET installation required. Tested on RTX 3090; RTX 5090 sensors remain unverified. Latest load/cooldown screenshot: https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/idle-load-cooldown-branded.png'
           if ($LASTEXITCODE -ne 0) { throw 'Release notes update failed' }
 

@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:GpuMonitor.ViewModels" xmlns:sp="using:ScottPlot.Avalonia" x:Class="GpuMonitor.Views.MainWindow" x:DataType="vm:MainWindowViewModel" Title="GPU Monitor · CUDA telemetry" Width="1440" Height="850" MinWidth="1200" MinHeight="650" Background="#101722">
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:GpuMonitor.ViewModels" xmlns:sp="using:ScottPlot.Avalonia" x:Class="GpuMonitor.Views.MainWindow" x:DataType="vm:MainWindowViewModel" Icon="avares://GpuMonitor/Assets/gpu-monitor.ico" Title="GPU Monitor · CUDA telemetry" Width="1440" Height="850" MinWidth="1200" MinHeight="650" Background="#101722">
 <Window.Styles>
  <Style Selector="Border.card"><Setter Property="Background" Value="#192332"/><Setter Property="CornerRadius" Value="8"/><Setter Property="Padding" Value="16,12"/><Setter Property="Margin" Value="0,0,10,0"/></Style>
  <Style Selector="TextBlock.label"><Setter Property="Foreground" Value="#A5B4C9"/><Setter Property="FontSize" Value="12"/></Style>
@@ -36,7 +36,7 @@
   </StackPanel>
   <TextBlock Classes="label" Text="{Binding LimitDescription}"/>
  </StackPanel>
- <StackPanel Grid.Row="5" Margin="0,14,0,0" Spacing="4"><TextBlock Text="{Binding Status}" FontSize="12"/><TextBlock Text="{Binding Sensor}" Foreground="#7D8DA5" FontSize="11"/></StackPanel>
+ <StackPanel Grid.Row="5" Margin="0,14,0,0" Spacing="4"><TextBlock Text="{Binding Status}" FontSize="12"/><TextBlock Text="{Binding Sensor}" Foreground="#7D8DA5" FontSize="11"/><TextBlock Text="Copyright &#169; Mannetroll Solutions AB" Foreground="#7D8DA5" FontSize="11" HorizontalAlignment="Right" Margin="0,4,0,0"/></StackPanel>
 </Grid>
 </Window>
 
