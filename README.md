@@ -1,6 +1,6 @@
 # GPU Monitor
 
-![GPU Monitor — five minutes of GPU load followed by five minutes of cooldown](https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/load-and-cooldown.png)
+![GPU Monitor — one minute idle, five minutes of GPU load, then five minutes of cooldown](https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/idle-load-cooldown-no-disk.png)
 
 [Download the portable Windows x64 EXE](https://github.com/mannetroll/GpuMonitor/releases/download/v0.1.0/GpuMonitor.exe) · [Release v0.1.0](https://github.com/mannetroll/GpuMonitor/releases/tag/v0.1.0)
 
