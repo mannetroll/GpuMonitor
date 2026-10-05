@@ -19,7 +19,17 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
  public string Power { get; private set; } = "N/A";
  public string Clocks { get; private set; } = "N/A";
  public string Fan { get; private set; } = "N/A";
- public string Status { get; private set; } = "Starting telemetry…";
+ private string liveStatus = "Starting telemetry...";
+ private int updateSpeedIndex = 1;
+ public string[] UpdateSpeeds { get; } = ["High", "Normal", "Low", "Paused"];
+ public int UpdateSpeedIndex
+ {
+  get => Volatile.Read(ref updateSpeedIndex);
+  set { if (value < 0 || value > 3 || value == UpdateSpeedIndex) return; Volatile.Write(ref updateSpeedIndex,value); Changed(); Changed(nameof(Status)); UpdateSpeedChanged?.Invoke(); }
+ }
+ public event Action? UpdateSpeedChanged;
+ public int UpdateIntervalMs => UpdateSpeedIndex switch { 0 => 250, 1 => 1000, 2 => 4000, _ => Timeout.Infinite };
+ public string Status => UpdateSpeedIndex == 3 ? "PAUSED | Last sample: " + liveStatus : liveStatus + $" | {UpdateSpeeds[UpdateSpeedIndex]} | {UpdateIntervalMs / 1000d:0.##} s interval";
  public string LimitDescription { get; private set; } = "Driver memory limit: N/A · Reference is configurable, not a verified hardware limit.";
  public string Sensor { get; private set; } = "LibreHardwareMonitor / NVIDIA";
  public string WarningColor { get; private set; } = "#58D6B0";
@@ -39,7 +49,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
   Clocks = $"Core {F(s.CoreClockMhz," MHz")}   /   Memory {F(s.MemoryClockMhz," MHz")}";
   ThermalState = s.MemoryJunctionC is not double t ? "UNAVAILABLE" : t >= (s.MemoryThermalLimitC ?? (double)Reference) ? "REFERENCE EXCEEDED" : t >= (double)Hot ? "HOT" : t >= (double)Warning ? "WARNING" : "NORMAL";
   WarningColor = ThermalState == "NORMAL" ? "#58D6B0" : ThermalState == "WARNING" ? "#FFC66D" : ThermalState == "UNAVAILABLE" ? "#94A3B8" : "#FF727F";
-  Status = !ValidThresholds ? "Set Warning < Hot < Reference." : s.Error != null ? $"Read failed · {s.Error}" : $"LIVE · {s.Timestamp:HH:mm:ss} · 1 sample/s · 15-minute rolling history";
+  liveStatus = !ValidThresholds ? "Set Warning < Hot < Reference." : s.Error != null ? $"Read failed · {s.Error}" : $"LIVE · {s.Timestamp:yyyy-MM-dd HH:mm:ss} · sample history · 15-minute rolling history";
   Sensor = sensor; LimitDescription = s.MemoryThermalLimitC is double limit ? $"Driver memory slowdown limit: {limit:0} °C (NVML) · Reference line follows this limit." : "Driver memory limit: N/A · Reference is configurable, not a verified hardware limit.";
   Changed(string.Empty);
  }

@@ -1,6 +1,6 @@
 # GPU Monitor
 
-![GPU Monitor — one minute idle, five minutes of GPU load, then five minutes of cooldown](https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/idle-load-cooldown-no-disk.png)
+![GPU Monitor — one minute idle, five minutes of GPU load, then five minutes of cooldown](https://raw.githubusercontent.com/mannetroll/GpuMonitor/v0.1.0/docs/idle-load-cooldown-dashboard.png)
 
 [Download the portable Windows x64 EXE](https://github.com/mannetroll/GpuMonitor/releases/download/v0.1.0/GpuMonitor.exe) · [Release v0.1.0](https://github.com/mannetroll/GpuMonitor/releases/tag/v0.1.0)
 
@@ -39,13 +39,13 @@ Startup, selected sensor names/identifiers, and read errors go to Console/Debug 
 - `Services/IGpuTelemetryService.cs`: replaceable hardware interface.
 - `Services/LibreHardwareMonitorTelemetryService.cs`: GPU-only computer handle, NVIDIA selection (RTX 3090 preferred), sensor discovery and error handling. Sensor types plus normalized names identify junction temperature. Core temperature is never used as a substitute.
 - `Services/NvmlMemoryLimit.cs`: optional startup-only NVIDIA memory slowdown threshold lookup because LibreHardwareMonitor does not expose this limit. No NVML loop or nvidia-smi subprocess is used for sampling. Ambiguous same-name GPU matches produce N/A.
-- `Infrastructure/RingBuffer.cs`: fixed 901 slots (15 minutes plus inclusive endpoints at one-second cadence).
+- `Infrastructure/RingBuffer.cs`: fixed 3,601 slots (15 minutes plus inclusive endpoints at the fastest 0.25-second cadence).
 - `ViewModels/MainWindowViewModel.cs`: current values, threshold validation and thermal status.
-- `Views/MainWindow.axaml(.cs)`: layout, persistent plot series and fixed 901-element chart arrays, sample dispatch and lifetime.
+- `Views/MainWindow.axaml(.cs)`: layout, persistent plot series and fixed 3,601-element chart arrays, sample dispatch and lifetime.
 
-A single background task owns the hardware handle. Poll start times are separated by at least one second; normal read duration is deducted from the delay. Slow reads do not overlap or cause catch-up polling. UI dispatch is awaited so updates cannot form an unbounded queue. Closing cancels delays and awaits any in-progress driver call before releasing the monitor handle. Native driver calls cannot be forcibly canceled.
+A single background task owns the hardware handle. The selected polling interval is 0.25, 1, or 4 seconds; read duration is deducted from the delay. Paused suspends polling. Slow reads do not overlap or cause catch-up polling. UI dispatch is awaited so updates cannot form an unbounded queue. Closing cancels delays and awaits any in-progress driver call before releasing the monitor handle. Native driver calls cannot be forcibly canceled.
 
-Avalonia uses software rendering. ScottPlot is refreshed once per sample, not at display refresh rate; minimized windows continue sampling but skip chart updates. Both plot lines and backing arrays are reused. Chart X limits continuously cover the previous 15 minutes, with now at the right edge. Left Y is normally 0–24 GB; right Y is °C. GB here means 1024 MiB (GiB), matching the RTX 3090's advertised 24 GB capacity.
+Avalonia uses software rendering. ScottPlot is refreshed once per sample, not at display refresh rate; minimized windows continue sampling but skip chart updates. Plot lines and backing arrays are reused. Chart X limits continuously cover the previous 15 minutes, with now at the right edge. The GPU chart uses watts on the left axis and temperatures on the right; the system chart uses percentages. GB here means 1024 MiB (GiB), matching the RTX 3090's advertised 24 GB capacity.
 
 ## Sensor backend on this machine
 
@@ -82,20 +82,17 @@ History is in-memory only and starts empty. No 15-minute synthetic prefill. Mini
 
 ## Verification
 
-Release build and desktop launch verified on this Windows 11 machine. 15 deterministic checks cover bounded wraparound (100,000 samples), sensor-name matching, missing values, error clearing, threshold boundaries, and driver-limit precedence. See `VERIFICATION.md` for actual readings and measured process overhead.
+Release build and desktop launch verified on this Windows 11 machine. 26 deterministic checks cover bounded wraparound (100,000 samples), sensor-name matching, missing values, error clearing, threshold boundaries, and driver-limit precedence. See `VERIFICATION.md` for actual readings and measured process overhead.
 
-## Screenshot
+## Dashboard
 
-<!-- Screenshot placeholder: add docs/gpu-monitor.png here. -->
-The desktop UI was visually inspected: dual axes, both live series, numeric threshold inputs, all live values, and the current sensor identifier are visible.
+The left chart plots CPU utilization, RAM usage, GPU fan speed and GPU load on a fixed 0-100% axis. The right chart plots GPU power (W), GPU core temperature and memory junction temperature. VRAM used/total remains a live value. The power axis starts at 0-400 W and expands for higher readings. Both charts show 15 minutes of timestamped history.
 
-## System dashboard update
+System CPU uses GetSystemTimes deltas; RAM uses GlobalMemoryStatusEx. CPU package watts and temperature are optional LibreHardwareMonitor readings. On this machine the unprivileged CPU backend returned zero for both; these invalid readings show N/A. GPU watts remain available. Fan percentage is the first available NVIDIA fan control sensor, not RPM. Disk telemetry is omitted.
 
-The left panel plots total Windows CPU utilization and physical RAM usage on a 0–100% axis, with aggregate physical-disk read + write throughput on a separate MB/s axis. Live values show used/total RAM and separate disk read/write rates. The right panel retains GPU VRAM and memory junction charts plus core, hotspot, load, watts, clocks and fan values. Both chart histories are bounded to 901 samples and cover 15 minutes.
+**Clear** resets both histories and their scales while preserving current values and thresholds. **Update speed** offers High (0.25 seconds), Normal (1 second, default), Low (4 seconds), and Paused. LIVE includes the sample date and time. Paused retains the last values and history.
 
-System CPU uses GetSystemTimes deltas; RAM uses GlobalMemoryStatusEx; disk uses Windows PhysicalDisk performance counters. MB and GB use binary units. Disk counters may be unavailable on systems with disabled counters or localized counter names. CPU package watts and temperature are optional LibreHardwareMonitor readings. On this machine the unprivileged CPU backend returned zero for both; these invalid readings are displayed as N/A, not measured zero consumption. No driver installation or elevation prompt is performed by the application. CPU package power is not whole-PC wall power. GPU watts remain available.
-
-GPU fan percentage is plotted on the left 0–100% axis in pink, alongside CPU/RAM, to make cooling response visible. It is the first available NVIDIA fan control sensor, not RPM.
+**Save PNG** exports both charts and live values through a save dialog. A 20-pixel (display-scaled) border matches the dashboard background. The image at the top shows a one-minute idle baseline, five-minute GPU load and five-minute cooldown.
 
 ## Portable single-file Windows build
 
@@ -103,10 +100,4 @@ Copy `artifacts/win-x64/GpuMonitor.exe` alone to another Windows x64 machine. No
 
 Rebuild with `dotnet publish -p:PublishProfile=Portable`. Trimming is disabled to preserve UI and hardware-library compatibility.
 
-The standalone EXE was copied into an isolated folder, successfully probed the RTX 3090, and launched its desktop window using the bundled runtime. An RTX 5090 has not been available for verification. NVIDIA selection uses the detected hardware; if both a 3090 and 5090 are installed, the existing selection policy prefers the 3090. Missing sensors show N/A and are never replaced with core temperature. The VRAM axis expands to the detected capacity when it exceeds 24 GB. Run `GpuMonitor.exe --probe` from a writable working directory to produce sensor-report.json for the new machine.
-
-
-Use **Clear** before starting a load test to discard both histories and reset the disk throughput scale to 0–10 MB/s. Sampling continues at one second, and the scale adapts only to new samples. Temperature thresholds and current-value cards are preserved.
-
-### v0.1.0 update: disk removed
-Disk sampling, values, and chart series have been removed. The left chart now shows CPU, RAM and GPU fan on a fixed 0–100% axis. Clear still resets both histories. Earlier screenshots show the previous layout.
+The standalone EXE was copied into an isolated folder, successfully probed the RTX 3090, and launched its desktop window using the bundled runtime. An RTX 5090 has not been available for verification. NVIDIA selection uses the detected hardware; if both a 3090 and 5090 are installed, the existing selection policy prefers the 3090. Missing sensors show N/A and are never replaced with core temperature. Run `GpuMonitor.exe --probe` from a writable working directory to produce sensor-report.json for the new machine.

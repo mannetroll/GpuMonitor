@@ -27,3 +27,12 @@ ring.Clear();
 Check(ring.Count==0 && ring.Capacity==901,"Clear removes history without changing capacity");
 ring.Add(7);ring.Add(8);
 Check(ring.Count==2 && ring[0]==7 && ring[1]==8,"Sampling resumes in order after clear");
+
+var speedVm = new MainWindowViewModel();
+Check(speedVm.UpdateIntervalMs == 1000,"Normal speed defaults to one second");
+speedVm.Apply(new(new DateTimeOffset(2026,10,5,12,34,56,TimeSpan.Zero),"RTX 3090"),"test");
+Check(speedVm.Status.Contains("2026-10-05 12:34:56"),"Live status includes date and time");
+foreach(var (index,interval) in new[]{(0,250),(1,1000),(2,4000),(3,Timeout.Infinite)}) { speedVm.UpdateSpeedIndex=index; Check(speedVm.UpdateIntervalMs==interval,$"Speed interval {index}"); }
+Check(speedVm.Status.StartsWith("PAUSED"),"Paused status appears immediately");
+speedVm.UpdateSpeedIndex=1; Check(speedVm.Status.StartsWith("LIVE"),"Resume restores live status");
+Console.WriteLine($"{checks} total checks passed.");

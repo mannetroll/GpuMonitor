@@ -4,11 +4,13 @@
  <Style Selector="TextBlock.label"><Setter Property="Foreground" Value="#A5B4C9"/><Setter Property="FontSize" Value="12"/></Style>
  <Style Selector="TextBlock.value"><Setter Property="FontSize" Value="24"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,5,0,0"/></Style>
 </Window.Styles>
-<Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
- <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,20">
+<Grid x:Name="Dashboard" Background="#101722" Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+ <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Margin="0,0,0,20">
   <StackPanel><TextBlock Text="GPU MONITOR / CUDA WORKSTATION" Foreground="#58D6B0" FontSize="11" LetterSpacing="2"/><TextBlock Text="{Binding GpuName}" FontSize="28" FontWeight="SemiBold" Margin="0,6,0,0"/></StackPanel>
-  <Button Grid.Column="1" Content="Clear" Click="ClearHistory" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip.Tip="Clear both histories and reset scales; sampling continues."/>
-  <Border Grid.Column="2" VerticalAlignment="Center" BorderBrush="{Binding WarningColor}" BorderThickness="1" CornerRadius="6" Padding="12,6"><TextBlock Text="{Binding ThermalState}" Foreground="{Binding WarningColor}"/></Border>
+  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,16,0"><TextBlock Text="Update speed" VerticalAlignment="Center"/><ComboBox Width="115" ItemsSource="{Binding UpdateSpeeds}" SelectedIndex="{Binding UpdateSpeedIndex, Mode=TwoWay}"/></StackPanel>
+  <Button Grid.Column="2" Content="Clear" Click="ClearHistory" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip.Tip="Clear both histories and reset scales; sampling continues."/>
+  <Button Grid.Column="3" Content="Save PNG" Click="SaveDashboardPng" VerticalAlignment="Center" Margin="0,0,12,0"/>
+  <Border Grid.Column="4" VerticalAlignment="Center" BorderBrush="{Binding WarningColor}" BorderThickness="1" CornerRadius="6" Padding="12,6"><TextBlock Text="{Binding ThermalState}" Foreground="{Binding WarningColor}"/></Border>
  </Grid>
  <Grid Grid.Row="1" Grid.RowSpan="3" ColumnDefinitions="*,16,*" RowDefinitions="Auto,*">
  <StackPanel Margin="0,0,0,12" Spacing="12">
