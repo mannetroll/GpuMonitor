@@ -107,3 +107,6 @@ The standalone EXE was copied into an isolated folder, successfully probed the R
 
 
 Use **Clear** before starting a load test to discard both histories and reset the disk throughput scale to 0–10 MB/s. Sampling continues at one second, and the scale adapts only to new samples. Temperature thresholds and current-value cards are preserved.
+
+### v0.1.0 update: disk removed
+Disk sampling, values, and chart series have been removed. The left chart now shows CPU, RAM and GPU fan on a fixed 0–100% axis. Clear still resets both histories. Earlier screenshots show the previous layout.

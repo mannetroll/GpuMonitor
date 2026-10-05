@@ -14,7 +14,6 @@
  <StackPanel Margin="0,0,0,12" Spacing="12">
   <TextBlock Text="SYSTEM / COOLING" FontSize="16" FontWeight="SemiBold" Foreground="#C49BFF"/>
   <UniformGrid Columns="2"><Border Classes="card"><StackPanel><TextBlock Classes="label" Text="CPU UTILIZATION"/><TextBlock Classes="value" Text="{Binding Cpu}"/></StackPanel></Border><Border Classes="card"><StackPanel><TextBlock Classes="label" Text="PHYSICAL MEMORY"/><TextBlock Classes="value" Text="{Binding Ram}"/></StackPanel></Border></UniformGrid>
-  <TextBlock Text="{Binding Disk}"/>
   <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Classes="label" Text="CPU PACKAGE POWER"/><TextBlock Text="{Binding CpuPower}"/><TextBlock Classes="label" Text="CPU TEMPERATURE"/><TextBlock Text="{Binding CpuTemperature}"/><TextBlock Classes="label" Text="GPU FAN"/><TextBlock Text="{Binding Fan}"/></StackPanel>
  </StackPanel>
  <StackPanel Grid.Column="2" Margin="0,0,0,12" Spacing="12">
@@ -38,6 +37,7 @@
  <StackPanel Grid.Row="5" Margin="0,14,0,0" Spacing="4"><TextBlock Text="{Binding Status}" FontSize="12"/><TextBlock Text="{Binding Sensor}" Foreground="#7D8DA5" FontSize="11"/></StackPanel>
 </Grid>
 </Window>
+
 
 
 

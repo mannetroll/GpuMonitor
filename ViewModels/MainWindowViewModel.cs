@@ -7,10 +7,9 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
  public event PropertyChangedEventHandler? PropertyChanged;
  public string Cpu { get; private set; } = "N/A";
  public string Ram { get; private set; } = "N/A";
- public string Disk { get; private set; } = "N/A";
  public string CpuPower { get; private set; } = "N/A";
  public string CpuTemperature { get; private set; } = "N/A";
- public void ApplySystem(SystemSample s) { Cpu=F(s.CpuPercent," %"); Ram=$"{F(s.RamUsedGb,"","0.0")} / {F(s.RamTotalGb," GB","0.0")}"; Disk=$"Read {F(s.DiskReadMBps," MB/s","0.0")} · Write {F(s.DiskWriteMBps," MB/s","0.0")}"; CpuPower=F(s.CpuPowerW," W"); CpuTemperature=F(s.CpuTemperatureC," °C"); Changed(string.Empty); }
+ public void ApplySystem(SystemSample s) { Cpu=F(s.CpuPercent," %"); Ram=$"{F(s.RamUsedGb,"","0.0")} / {F(s.RamTotalGb," GB","0.0")}"; CpuPower=F(s.CpuPowerW," W"); CpuTemperature=F(s.CpuTemperatureC," °C"); Changed(string.Empty); }
  public string GpuName { get; private set; } = "Detecting NVIDIA GPU…";
  public string Vram { get; private set; } = "N/A";
  public string Junction { get; private set; } = "N/A";
@@ -45,6 +44,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
   Changed(string.Empty);
  }
 }
+
 
 
 

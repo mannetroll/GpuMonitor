@@ -14,7 +14,7 @@ public partial class MainWindow : Window
  private readonly RingBuffer<GpuSample> history = new(901);
  private readonly double[] times = new double[901], memory = new double[901], temperature = new double[901];
  private readonly RingBuffer<SystemSample> systemHistory=new(901);
- private readonly double[] cpuValues=new double[901],ramValues=new double[901],diskValues=new double[901],fanValues=new double[901];
+ private readonly double[] cpuValues=new double[901],ramValues=new double[901],fanValues=new double[901];
  private ScottPlot.Avalonia.AvaPlot systemChart=null!;
  private readonly CancellationTokenSource cancellation = new();
  private readonly ScottPlot.Avalonia.AvaPlot chart;
@@ -81,12 +81,12 @@ public partial class MainWindow : Window
   history.Clear(); systemHistory.Clear();
   Array.Fill(memory,double.NaN); Array.Fill(temperature,double.NaN);
   Array.Fill(cpuValues,double.NaN); Array.Fill(ramValues,double.NaN);
-  Array.Fill(diskValues,double.NaN); Array.Fill(fanValues,double.NaN);
+   Array.Fill(fanValues,double.NaN);
   for(int i=0;i<times.Length;i++) times[i]=clearedAt.LocalDateTime.AddSeconds(i-900).ToOADate();
   UpdateAxes(clearedAt,lastTotalGb);
   systemChart.Plot.Axes.SetLimitsX(times[0],times[^1]);
   systemChart.Plot.Axes.SetLimitsY(0,100);
-  systemChart.Plot.Axes.SetLimitsY(0,10,systemChart.Plot.Axes.Right);
+
   chart.Refresh(); systemChart.Refresh();
  }
  private void Apply(GpuSample sample,string sensor,SystemSample system)
@@ -97,14 +97,13 @@ public partial class MainWindow : Window
   history.Add(sample); systemHistory.Add(system); vm.Apply(sample,sensor); vm.ApplySystem(system);
   if (WindowState == WindowState.Minimized) return;
   var offset=times.Length-history.Count;
-  for (int i=0;i<offset;i++) { times[i]=history[0].Timestamp.LocalDateTime.AddSeconds(i-offset).ToOADate(); memory[i]=temperature[i]=cpuValues[i]=ramValues[i]=diskValues[i]=fanValues[i]=double.NaN; }
-  for (int i=0;i<history.Count;i++) { var s=history[i]; var j=offset+i; times[j]=s.Timestamp.LocalDateTime.ToOADate(); memory[j]=s.MemoryUsedGb??double.NaN; temperature[j]=s.MemoryJunctionC??double.NaN; fanValues[j]=s.FanPercent??double.NaN; var sys=systemHistory[i]; cpuValues[j]=sys.CpuPercent??double.NaN; ramValues[j]=sys.RamPercent??double.NaN; diskValues[j]=(sys.DiskReadMBps+sys.DiskWriteMBps)??double.NaN; }
+  for (int i=0;i<offset;i++) { times[i]=history[0].Timestamp.LocalDateTime.AddSeconds(i-offset).ToOADate(); memory[i]=temperature[i]=cpuValues[i]=ramValues[i]=fanValues[i]=double.NaN; }
+  for (int i=0;i<history.Count;i++) { var s=history[i]; var j=offset+i; times[j]=s.Timestamp.LocalDateTime.ToOADate(); memory[j]=s.MemoryUsedGb??double.NaN; temperature[j]=s.MemoryJunctionC??double.NaN; fanValues[j]=s.FanPercent??double.NaN; var sys=systemHistory[i]; cpuValues[j]=sys.CpuPercent??double.NaN; ramValues[j]=sys.RamPercent??double.NaN;  }
   if (vm.ValidThresholds) { warning.Y=(double)vm.Warning; hot.Y=(double)vm.Hot; reference.Y=sample.MemoryThermalLimitC ?? (double)vm.Reference; }
   UpdateAxes(sample.Timestamp,sample.MemoryTotalGb??24); chart.Refresh();
   systemChart.Plot.Axes.SetLimitsX(sample.Timestamp.LocalDateTime.AddMinutes(-15).ToOADate(),sample.Timestamp.LocalDateTime.ToOADate());
   systemChart.Plot.Axes.SetLimitsY(0,100);
-  double maxDisk=10; foreach(var v in diskValues) if(double.IsFinite(v)) maxDisk=Math.Max(maxDisk,v*1.1);
-  systemChart.Plot.Axes.SetLimitsY(0,maxDisk,systemChart.Plot.Axes.Right); systemChart.Refresh();
+  systemChart.Refresh();
  }
  private async void OnClosing(object? sender,WindowClosingEventArgs e)
  {
@@ -117,14 +116,13 @@ public partial class MainWindow : Window
  }
  private void SetupSystemChart()
  {
-  Array.Fill(cpuValues,double.NaN);Array.Fill(ramValues,double.NaN);Array.Fill(diskValues,double.NaN);Array.Fill(fanValues,double.NaN);
+  Array.Fill(cpuValues,double.NaN);Array.Fill(ramValues,double.NaN);Array.Fill(fanValues,double.NaN);
   var p=systemChart.Plot;
   var c=p.Add.Scatter(times,cpuValues);c.LegendText="CPU %";c.Color=Color.FromHex("C49BFF");c.MarkerSize=0;c.LineWidth=2;
   var r=p.Add.Scatter(times,ramValues);r.LegendText="RAM %";r.Color=Color.FromHex("6CAEFF");r.MarkerSize=0;r.LineWidth=2;
-  var d=p.Add.Scatter(times,diskValues);d.LegendText="Disk MB/s";d.Color=Color.FromHex("FFC66D");d.MarkerSize=0;d.LineWidth=1.5f;d.Axes.YAxis=p.Axes.Right;
   var fan=p.Add.Scatter(times,fanValues);fan.LegendText="GPU fan %";fan.Color=Color.FromHex("FF83BE");fan.MarkerSize=0;fan.LineWidth=2;
   var axis=p.Axes.DateTimeTicksBottom();((ScottPlot.TickGenerators.DateTimeAutomatic)axis.TickGenerator).LabelFormatter=dt=>dt.ToString("HH:mm");
-  p.Axes.Left.Label.Text="CPU / RAM / fan · %";p.Axes.Right.Label.Text="Disk read + write · MB/s";
+  p.Axes.Left.Label.Text="CPU / RAM / fan · %";p.Axes.Right.IsVisible=false;
   p.FigureBackground.Color=Color.FromHex("192332");p.DataBackground.Color=Color.FromHex("192332");p.Axes.Color(Color.FromHex("A5B4C9"));p.Grid.MajorLineColor=Color.FromHex("293548");p.ShowLegend(Alignment.UpperLeft);systemChart.UserInputProcessor.Disable();
  }
  private void LoadSettings()
@@ -132,6 +130,7 @@ public partial class MainWindow : Window
  private void SaveSettings()
  { try { if(vm.ValidThresholds) { Directory.CreateDirectory(Path.GetDirectoryName(settingsPath)!); File.WriteAllText(settingsPath,JsonSerializer.Serialize(new[]{vm.Warning,vm.Hot,vm.Reference})); } } catch(Exception e) { System.Diagnostics.Debug.WriteLine(e.Message); } }
 }
+
 
 
 
